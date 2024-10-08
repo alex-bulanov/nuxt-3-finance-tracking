@@ -20,5 +20,18 @@ export default defineNuxtConfig({
 			}
 		],
 		'@nuxt/ui'
-	]
+	],
+
+	css: ['~/assets/scss/main.scss'],
+
+	vite: {
+		css: {
+			preprocessorOptions: {
+				scss: {
+					silenceDeprecations: ['legacy-js-api'],
+					additionalData: `@use "@/assets/scss/general/variables.scss" as *;`
+				}
+			}
+		}
+	}
 })
