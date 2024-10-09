@@ -7,7 +7,22 @@ interface Props {
 	loading: boolean
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
+
+const isUp = computed<boolean>(() => props.amount >= props.lastAmount)
+
+const icon = computed<string>(() =>
+	isUp.value ? 'i-heroicons-arrow-trending-up-16-solid' : 'i-heroicons-arrow-trending-down-16-solid'
+)
+
+const percentage = computed(() => {
+	if (props.amount === 0 || props.lastAmount === 0) return '∞%'
+
+	const bigger = Math.max(props.amount, props.lastAmount)
+	const lower = Math.min(props.amount, props.lastAmount)
+
+	return `${Math.ceil(((bigger - lower) / lower) * 100)}%`
+})
 </script>
 
 <template>
@@ -22,8 +37,11 @@ defineProps<Props>()
 		<div>
 			<USkeleton v-if="loading" class="w-full h-6" />
 			<div v-else class="flex items-center space-x-2">
-				<UIcon class="w-6 h-6" :class="[color]" name="i-heroicons-arrow-trending-up-16-solid" />
-				<p class="text-sm text-gray-600 dark:text-gray-400">30% vs last period</p>
+				<UIcon class="w-6 h-6" :class="{ red: !isUp, green: isUp }" :name="icon" />
+				<!-- " vs last period " -->
+				<p class="text-sm text-gray-600 dark:text-gray-400">
+					{{ percentage }} по сравнению с предыдущим периодом
+				</p>
 			</div>
 		</div>
 	</div>
