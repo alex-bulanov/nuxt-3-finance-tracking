@@ -1,1 +1,5 @@
-export const transactionViewOptions = ['Yearly', 'Monthly', 'Daily']
+export const transactionViewOptions = [
+	'годовой', // 'Yearly',
+	'месячный', // 'Monthly',
+	'суточный' // 'Daily'
+]
