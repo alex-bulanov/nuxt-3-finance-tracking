@@ -19,7 +19,8 @@ export default defineNuxtConfig({
 				cache: false
 			}
 		],
-		'@nuxt/ui'
+		'@nuxt/ui',
+		'@nuxtjs/supabase'
 	],
 
 	css: ['~/assets/scss/main.scss'],
@@ -33,5 +34,9 @@ export default defineNuxtConfig({
 				}
 			}
 		}
+	},
+
+	supabase: {
+		redirect: false
 	}
 })
