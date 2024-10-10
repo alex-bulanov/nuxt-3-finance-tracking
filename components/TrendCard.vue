@@ -23,6 +23,8 @@ const percentage = computed(() => {
 
 	return `${Math.ceil(((bigger - lower) / lower) * 100)}%`
 })
+
+const { currency } = useCurrency(props.amount)
 </script>
 
 <template>
@@ -32,7 +34,7 @@ const percentage = computed(() => {
 		</div>
 		<div class="my-2">
 			<USkeleton v-if="loading" class="w-full h-8" />
-			<p v-else class="text-2xl font-bold text-black dark:text-white">{{ amount }}</p>
+			<p v-else class="text-2xl font-bold text-black dark:text-white">{{ currency }}</p>
 		</div>
 		<div>
 			<USkeleton v-if="loading" class="w-full h-6" />
