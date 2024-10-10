@@ -31,7 +31,14 @@ const viewSelected = ref(transactionViewOptions[1])
 				</div>
 			</section>
 
-			<section></section>
+			<section class="my-10">
+				<div class="grid grid-cols-1">
+					<TransactionCard />
+					<TransactionCard />
+					<TransactionCard />
+					<TransactionCard />
+				</div>
+			</section>
 
 			<section></section>
 		</UContainer>
