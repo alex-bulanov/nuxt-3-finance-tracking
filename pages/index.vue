@@ -1,7 +1,36 @@
 <script setup lang="ts">
 import { transactionViewOptions } from '~/constants'
+import type { Transaction } from '~/types/Transation'
 
 const viewSelected = ref(transactionViewOptions[1])
+
+const supabase = useSupabaseClient()
+
+const transactions = ref<Transaction[]>([])
+
+const { data, error, status } = useAsyncData('transactions', async () => {
+	const { data, error } = await supabase.from('transactions').select()
+
+	if (error) {
+		return error
+	}
+
+	return data
+})
+
+if (error.value) {
+	throw createError({
+		statusCode: error.value.statusCode,
+		statusMessage: error.value.statusMessage,
+		fatal: true
+	})
+}
+
+const isLoading = computed(() => status.value === 'pending')
+
+if (data.value) {
+	transactions.value = data.value as Transaction[]
+}
 </script>
 
 <template>
@@ -33,14 +62,16 @@ const viewSelected = ref(transactionViewOptions[1])
 
 			<section class="my-10">
 				<div class="grid grid-cols-1">
-					<TransactionCard />
-					<TransactionCard />
-					<TransactionCard />
-					<TransactionCard />
+					<TransactionCard
+						v-for="transaction in transactions"
+						:key="transaction.id"
+						:transaction="transaction"
+						:loading="isLoading"
+					/>
 				</div>
 			</section>
 
-			<section></section>
+			<section>Курс Валют ЦБ</section>
 		</UContainer>
 	</div>
 </template>

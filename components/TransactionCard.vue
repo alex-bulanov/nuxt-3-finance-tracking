@@ -1,9 +1,14 @@
 <script setup lang="ts">
-interface Props {}
+import type { Transaction } from '~/types/Transation'
 
-defineProps<Props>()
+interface Props {
+	transaction: Transaction
+	loading: boolean
+}
 
-const { currency } = useCurrency(3000)
+const props = defineProps<Props>()
+
+const { currency } = useCurrency(props.transaction.amount || 0)
 
 const items = [
 	[
@@ -30,10 +35,10 @@ const items = [
 			<div class="w-1/2 flex justify-between items-center space-x-2">
 				<div class="flex items-center space-x-1 truncate">
 					<UIcon class="text-green-600 shrink-0" name="i-heroicons-arrow-long-up-16-solid" />
-					<span class="text-sm font-semibold truncate">Зарплата</span>
+					<span class="text-sm font-semibold truncate">{{ transaction.description }}</span>
 				</div>
 
-				<UBadge color="white">Категория</UBadge>
+				<UBadge v-if="transaction.category" color="white">{{ transaction.category }}</UBadge>
 			</div>
 			<div class="w-1/2 flex justify-between items-center space-x-2">
 				<div class="shrink-0 grow text-end">{{ currency }}</div>

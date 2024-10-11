@@ -1,5 +1,5 @@
 export const transactionViewOptions = [
-	'годовой', // 'Yearly',
-	'месячный', // 'Monthly',
-	'суточный' // 'Daily'
+	'Год', // 'Yearly',
+	'Месяц', // 'Monthly',
+	'День' // 'Daily'
 ]
