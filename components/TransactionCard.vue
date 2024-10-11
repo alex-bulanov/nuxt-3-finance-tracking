@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Transaction } from '~/types/Transation'
+import { TypeTransaction } from '~/types/TypeTransaction'
 
 interface Props {
 	transaction: Transaction
@@ -27,6 +28,14 @@ const items = [
 		}
 	]
 ]
+
+const isUp = computed<boolean>(() => props.transaction.type === TypeTransaction.INCOME)
+
+const icon = computed<string>(() =>
+	props.transaction.type === TypeTransaction.INCOME
+		? 'i-heroicons-arrow-up-right-16-solid'
+		: 'i-heroicons-arrow-down-left-16-solid'
+)
 </script>
 
 <template>
@@ -34,7 +43,7 @@ const items = [
 		<div class="flex space-x-4">
 			<div class="w-1/2 flex justify-between items-center space-x-2">
 				<div class="flex items-center space-x-1 truncate">
-					<UIcon class="text-green-600 shrink-0" name="i-heroicons-arrow-long-up-16-solid" />
+					<UIcon class="shrink-0 mt-1 w-6 h-6" :class="{ red: !isUp, green: isUp }" :name="icon" />
 					<span class="text-sm font-semibold truncate">{{ transaction.description }}</span>
 				</div>
 
@@ -50,3 +59,13 @@ const items = [
 		</div>
 	</div>
 </template>
+
+<style lang="scss" scoped>
+.green {
+	@apply text-green-600 dark:text-green-400;
+}
+
+.red {
+	@apply text-red-600 dark:text-red-400;
+}
+</style>

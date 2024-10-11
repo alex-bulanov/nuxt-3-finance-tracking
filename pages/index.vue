@@ -52,7 +52,6 @@ if (data.value) {
 
 			<section class="my-10">
 				<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
-					<!-- "Income/Доход" "Expenses/Расходы" "Investment/Инвестиции" "Savings/Сбережения"  -->
 					<TrendCard title="Доход" :amount="4000" :last-amount="3000" color="green" :loading="false" />
 					<TrendCard title="Расходы" :amount="4000" :last-amount="3000" color="red" :loading="false" />
 					<TrendCard title="Инвестиции" :amount="3000" :last-amount="8000" color="green" :loading="false" />
