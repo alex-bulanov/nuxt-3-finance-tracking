@@ -79,12 +79,15 @@ console.log('transactionsGroupedByDate', transactionsGroupedByDate.value)
 
 			<section class="my-10">
 				<div class="grid grid-cols-1">
-					<TransactionCard
-						v-for="transaction in transactions"
-						:key="transaction.id"
-						:transaction="transaction"
-						:loading="isLoading"
-					/>
+					<div v-for="(transactionsOnDay, date) in transactionsGroupedByDate" :key="date">
+						<DailyTransactionSummaryCard :date="date" :transactions="transactionsOnDay" />
+						<TransactionCard
+							v-for="transaction in transactionsOnDay"
+							:key="transaction.id"
+							:transaction="transaction"
+							:loading="isLoading"
+						/>
+					</div>
 				</div>
 			</section>
 

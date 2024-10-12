@@ -50,7 +50,7 @@ const icon = computed<string>(() =>
 				<UBadge v-if="transaction.category" color="white">{{ transaction.category }}</UBadge>
 			</div>
 			<div class="w-1/2 flex justify-between items-center space-x-2">
-				<div class="shrink-0 grow text-end">{{ currency }}</div>
+				<div class="shrink-0 grow text-end font-mono">{{ currency }}</div>
 
 				<UDropdown :items="items" mode="click" :popper="{ placement: 'bottom-start' }">
 					<UButton truncate icon="i-heroicons-cog-16-solid" class="w-full" color="white" variant="ghost" />

@@ -1,7 +1,7 @@
 <script setup lang="ts"></script>
 
 <template>
-	<header class="fixed top-0 left-0 z-50 w-full bg-white shadow-sm">
+	<header class="fixed top-0 left-0 z-50 w-full bg-white dark:bg-[#1c1b22] shadow-sm">
 		<UContainer>
 			<div class="flex justify-between items-center py-2">
 				<div>

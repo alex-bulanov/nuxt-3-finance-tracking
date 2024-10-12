@@ -34,7 +34,7 @@ const { currency } = useCurrency(props.amount)
 		</div>
 		<div class="my-2">
 			<USkeleton v-if="loading" class="w-full h-8" />
-			<p v-else class="text-2xl font-bold text-black dark:text-white">{{ currency }}</p>
+			<p v-else class="text-2xl font-bold text-black dark:text-white font-mono">{{ currency }}</p>
 		</div>
 		<div>
 			<USkeleton v-if="loading" class="w-full h-6" />
@@ -42,7 +42,7 @@ const { currency } = useCurrency(props.amount)
 				<UIcon class="w-6 h-6" :class="{ red: !isUp, green: isUp }" :name="icon" />
 				<!-- " vs last period " -->
 				<p class="text-sm text-gray-600 dark:text-gray-400">
-					{{ percentage }} по сравнению с предыдущим периодом
+					<span class="font-mono">{{ percentage }}</span> по сравнению с предыдущим периодом
 				</p>
 			</div>
 		</div>
