@@ -36,7 +36,7 @@ const transactionsGroupedByDate = computed(() => {
 	const grouped: { [key: string]: (typeof transactions.value)[0][] } = {}
 
 	for (const transaction of transactions.value) {
-		const date = new Date(transaction.created_at).toISOString().split('T')[0]
+		const date = new Date(transaction.created_at).toLocaleString('ru').split(',')[0]
 
 		if (!grouped[date]) {
 			grouped[date] = []

@@ -9,7 +9,32 @@ interface Props {
 
 const props = defineProps<Props>()
 
+const isLoading = ref<boolean>(false)
+
+const toast = useToast()
+const supabase = useSupabaseClient()
 const { currency } = useCurrency(props.transaction.amount || 0)
+
+const deleteTransaction = async () => {
+	isLoading.value = true
+	try {
+		await supabase.from('transactions').delete().eq('id', props.transaction.id)
+
+		toast.add({
+			title: 'Запись успешно удалена',
+			icon: 'i-heroicons-check-circle-16-solid',
+			color: 'green'
+		})
+	} catch (error) {
+		toast.add({
+			title: 'Ошибка',
+			icon: 'i-heroicons-exclamation-circle-16-solid',
+			color: 'red'
+		})
+	} finally {
+		isLoading.value = false
+	}
+}
 
 const items = [
 	[
@@ -24,7 +49,7 @@ const items = [
 			icon: 'i-heroicons-trash-16-solid',
 			class: 'hover:bg-red-50 dark:hover:bg-red-400',
 			iconClass: 'text-red-600 dark:text-white',
-			click: () => console.log('Удалить')
+			click: () => deleteTransaction()
 		}
 	]
 ]
@@ -53,7 +78,14 @@ const icon = computed<string>(() =>
 				<div class="shrink-0 grow text-end font-mono">{{ currency }}</div>
 
 				<UDropdown :items="items" mode="click" :popper="{ placement: 'bottom-start' }">
-					<UButton truncate icon="i-heroicons-cog-16-solid" class="w-full" color="white" variant="ghost" />
+					<UButton
+						truncate
+						icon="i-heroicons-cog-16-solid"
+						class="w-full"
+						color="white"
+						variant="ghost"
+						:loading="isLoading"
+					/>
 				</UDropdown>
 			</div>
 		</div>
