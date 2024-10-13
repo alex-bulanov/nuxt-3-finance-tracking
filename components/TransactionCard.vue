@@ -8,6 +8,9 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const emits = defineEmits<{
+	(e: 'deleted', id: number): void
+}>()
 
 const isLoading = ref<boolean>(false)
 
@@ -25,6 +28,8 @@ const deleteTransaction = async () => {
 			icon: 'i-heroicons-check-circle-16-solid',
 			color: 'green'
 		})
+
+		emits('deleted', props.transaction.id)
 	} catch (error) {
 		toast.add({
 			title: 'Ошибка',

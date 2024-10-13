@@ -7,30 +7,26 @@ const viewSelected = ref(transactionViewOptions[1])
 const supabase = useSupabaseClient()
 
 const transactions = ref<Transaction[]>([])
+const isLoading = ref<boolean>(false)
 
-const { data, error, status } = useAsyncData('transactions', async () => {
-	const { data, error } = await supabase.from('transactions').select()
+const fetchTransactions = async () => {
+	isLoading.value = true
+	try {
+		const { data } = await useAsyncData('transactions', async () => {
+			const { data, error } = await supabase.from('transactions').select()
 
-	if (error) {
-		return error
+			if (error || !data) return []
+
+			return data
+		})
+
+		return data.value ?? []
+	} finally {
+		isLoading.value = false
 	}
-
-	return data
-})
-
-if (error.value) {
-	throw createError({
-		statusCode: error.value.statusCode,
-		statusMessage: error.value.statusMessage,
-		fatal: true
-	})
 }
 
-const isLoading = computed(() => status.value === 'pending')
-
-if (data.value) {
-	transactions.value = data.value as Transaction[]
-}
+const refreshTransactions = async () => (transactions.value = await fetchTransactions())
 
 const transactionsGroupedByDate = computed(() => {
 	const grouped: { [key: string]: (typeof transactions.value)[0][] } = {}
@@ -48,7 +44,11 @@ const transactionsGroupedByDate = computed(() => {
 	return grouped
 })
 
-console.log('transactionsGroupedByDate', transactionsGroupedByDate.value)
+const handleDaleted = async () => {
+	await refreshTransactions()
+}
+
+await refreshTransactions()
 </script>
 
 <template>
@@ -70,15 +70,21 @@ console.log('transactionsGroupedByDate', transactionsGroupedByDate.value)
 
 			<section class="my-10">
 				<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
-					<TrendCard title="Доход" :amount="4000" :last-amount="3000" color="green" :loading="false" />
-					<TrendCard title="Расходы" :amount="4000" :last-amount="3000" color="red" :loading="false" />
-					<TrendCard title="Инвестиции" :amount="3000" :last-amount="8000" color="green" :loading="false" />
-					<TrendCard title="Сбережения" :amount="4000" :last-amount="3000" color="red" :loading="false" />
+					<TrendCard title="Доход" :amount="4000" :last-amount="3000" color="green" :loading="isLoading" />
+					<TrendCard title="Расходы" :amount="4000" :last-amount="3000" color="red" :loading="isLoading" />
+					<TrendCard
+						title="Инвестиции"
+						:amount="3000"
+						:last-amount="8000"
+						color="green"
+						:loading="isLoading"
+					/>
+					<TrendCard title="Сбережения" :amount="4000" :last-amount="3000" color="red" :loading="isLoading" />
 				</div>
 			</section>
 
 			<section class="my-10">
-				<div class="grid grid-cols-1">
+				<div v-if="!isLoading" class="grid grid-cols-1">
 					<div v-for="(transactionsOnDay, date) in transactionsGroupedByDate" :key="date">
 						<DailyTransactionSummaryCard :date="date" :transactions="transactionsOnDay" />
 						<TransactionCard
@@ -86,8 +92,12 @@ console.log('transactionsGroupedByDate', transactionsGroupedByDate.value)
 							:key="transaction.id"
 							:transaction="transaction"
 							:loading="isLoading"
+							@deleted="handleDaleted"
 						/>
 					</div>
+				</div>
+				<div v-else>
+					<USkeleton v-for="_ in 4" :key="_" class="h-8 w-full" />
 				</div>
 			</section>
 
