@@ -3,6 +3,7 @@ import { transactionViewOptions } from '~/constants'
 import { TypeTransaction } from '~/types/TypeTransaction'
 import type { Transaction } from '~/types/Transation'
 
+const isOpen = ref(false)
 const viewSelected = ref(transactionViewOptions[1])
 
 const supabase = useSupabaseClient()
@@ -118,10 +119,19 @@ await refreshTransactions()
 						</p>
 					</div>
 					<div>
-						<UButton class="md:px-6" square color="white" size="xl" :ui="{ rounded: 'rounded-full' }">
+						<UButton
+							class="md:px-6"
+							square
+							color="white"
+							size="xl"
+							:ui="{ rounded: 'rounded-full' }"
+							@click="isOpen = true"
+						>
 							<UIcon class="w-6 h-6 md:hidden" name="i-heroicons-plus-16-solid" />
 							<span class="hidden md:block pb-1 text-lg font-semibold">Новая операция</span>
 						</UButton>
+
+						<TransactionModal v-model="isOpen" />
 					</div>
 				</div>
 			</section>
