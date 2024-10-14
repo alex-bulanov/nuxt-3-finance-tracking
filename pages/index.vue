@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { transactionViewOptions } from '~/constants'
+import { TypeTransaction } from '~/types/TypeTransaction'
 import type { Transaction } from '~/types/Transation'
 
 const viewSelected = ref(transactionViewOptions[1])
@@ -8,6 +9,15 @@ const supabase = useSupabaseClient()
 
 const transactions = ref<Transaction[]>([])
 const isLoading = ref<boolean>(false)
+
+const incomes = computed(() => transactions.value.filter(t => t.type === TypeTransaction.INCOME))
+const expenses = computed(() => transactions.value.filter(t => t.type === TypeTransaction.EXPENSES))
+
+const incomesCount = computed(() => incomes.value.length)
+const expensesCount = computed(() => expenses.value.length)
+
+const incomesTotal = computed(() => incomes.value.reduce((sum, t) => sum + Number(t.amount), 0))
+const expensesTotal = computed(() => expenses.value.reduce((sum, t) => sum + Number(t.amount), 0))
 
 const fetchTransactions = async () => {
 	isLoading.value = true
@@ -70,8 +80,20 @@ await refreshTransactions()
 
 			<section class="my-10">
 				<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
-					<TrendCard title="Доход" :amount="4000" :last-amount="3000" color="green" :loading="isLoading" />
-					<TrendCard title="Расходы" :amount="4000" :last-amount="3000" color="red" :loading="isLoading" />
+					<TrendCard
+						title="Доход"
+						:amount="4000"
+						:last-amount="incomesTotal"
+						color="green"
+						:loading="isLoading"
+					/>
+					<TrendCard
+						title="Расходы"
+						:amount="4000"
+						:last-amount="expensesTotal"
+						color="red"
+						:loading="isLoading"
+					/>
 					<TrendCard
 						title="Инвестиции"
 						:amount="3000"
@@ -80,6 +102,27 @@ await refreshTransactions()
 						:loading="isLoading"
 					/>
 					<TrendCard title="Сбережения" :amount="4000" :last-amount="3000" color="red" :loading="isLoading" />
+				</div>
+			</section>
+
+			<section class="my-10">
+				<div class="flex justify-between items-center space-x-4">
+					<div>
+						<h2 class="text-xl font-semibold">
+							<!-- Transactions -->
+							Операции
+						</h2>
+						<p class="text-gray-600 dark:text-gray-400">
+							<!-- You have {{ incomesCount }} incomes and {{ expensesCount }} expenses this period -->
+							За этот период у вас было {{ incomesCount }} доходов и {{ expensesCount }} расходов.
+						</p>
+					</div>
+					<div>
+						<UButton class="md:px-6" square color="white" size="xl" :ui="{ rounded: 'rounded-full' }">
+							<UIcon class="w-6 h-6 md:hidden" name="i-heroicons-plus-16-solid" />
+							<span class="hidden md:block pb-1 text-lg font-semibold">Новая операция</span>
+						</UButton>
+					</div>
 				</div>
 			</section>
 
