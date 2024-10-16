@@ -43,26 +43,39 @@ const state = reactive<FormState>({
 	description: ''
 })
 
-const commonSchema = Yup.object().shape({
-	type: Yup.string().oneOf(
-		[TypeTransaction.INCOME, TypeTransaction.EXPENSES, TypeTransaction.INVESTMENT, TypeTransaction.SAVINGS],
-		'Пожалуйста, выберите один из вариантов'
-	),
+const defaultSchema = Yup.object({
+	type: Yup.string()
+		.oneOf(
+			[TypeTransaction.INCOME, TypeTransaction.EXPENSES, TypeTransaction.INVESTMENT, TypeTransaction.SAVINGS],
+			'Пожалуйста, выберите тип'
+		)
+		.required(),
 	amount: Yup.number()
+		.positive('Сумма должна быть больше 0')
 		.transform((value, originalValue) => {
 			return originalValue === '' ? undefined : value
 		})
 		.nullable()
 		.required('Обязательное поле'),
 	created_at: Yup.string().required('Обязательное поле'),
-	category: Yup.string().oneOf([...categories], 'Пожалуйста, выберите один из вариантов'),
 	description: Yup.string().optional()
 })
 
-const schema = computed(() => {
-	const finalSchema = commonSchema
+const expenseSchema = Yup.object({
+	type: Yup.string().oneOf([TypeTransaction.EXPENSES]).required(),
+	category: Yup.string()
+		.oneOf([...categories], 'Пожалуйста, выберите категорию')
+		.required('Обязательное поле')
+})
 
-	return finalSchema
+const schema = Yup.lazy((value: any) => {
+	switch (value.type) {
+		case TypeTransaction.EXPENSES:
+			return expenseSchema.concat(defaultSchema)
+
+		default:
+			return defaultSchema
+	}
 })
 
 const handleAmountInput = (event: Event) => {
@@ -198,7 +211,12 @@ const onError = (event: FormErrorEvent): void => {
 						/>
 					</UFormGroup>
 
-					<UFormGroup label="Категория" name="category" :required="true">
+					<UFormGroup
+						v-if="state.type === TypeTransaction.EXPENSES"
+						label="Категория"
+						name="category"
+						:required="true"
+					>
 						<USelect v-model="state.category" :options="categories" :disabled="isLoading" />
 					</UFormGroup>
 
