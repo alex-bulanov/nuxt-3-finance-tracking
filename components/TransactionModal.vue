@@ -1,5 +1,10 @@
 <script setup lang="ts">
+import * as Yup from 'yup'
+import type { FormErrorEvent } from '#ui/types'
+
 import { categories, transactions } from '~/constants'
+import { TypeTransaction } from '~/types/TypeTransaction'
+
 interface Props {
 	modelValue: boolean
 }
@@ -18,6 +23,132 @@ const model = computed({
 		emits('update:modelValue', newValue)
 	}
 })
+
+const isLoading = ref<boolean>(false)
+const formRef = ref()
+
+interface FormState {
+	type: string
+	amount: number | undefined
+	created_at: string
+	category: string
+	description: string
+}
+
+const state = reactive<FormState>({
+	type: '',
+	amount: undefined,
+	created_at: '',
+	category: '',
+	description: ''
+})
+
+const commonSchema = Yup.object().shape({
+	type: Yup.string().oneOf(
+		[TypeTransaction.INCOME, TypeTransaction.EXPENSES, TypeTransaction.INVESTMENT, TypeTransaction.SAVINGS],
+		'Пожалуйста, выберите один из вариантов'
+	),
+	amount: Yup.number()
+		.transform((value, originalValue) => {
+			return originalValue === '' ? undefined : value
+		})
+		.nullable()
+		.required('Обязательное поле'),
+	created_at: Yup.string().required('Обязательное поле'),
+	category: Yup.string().oneOf([...categories], 'Пожалуйста, выберите один из вариантов'),
+	description: Yup.string().optional()
+})
+
+const schema = computed(() => {
+	const finalSchema = commonSchema
+
+	return finalSchema
+})
+
+const handleAmountInput = (event: Event) => {
+	const target = event.target as HTMLInputElement
+	const regex = /^[0-9]*\.?[0-9]{0,2}$/
+
+	let value = target.value
+
+	value = value.replace(',', '.')
+
+	if (!regex.test(value)) {
+		target.value = value.slice(0, -1)
+		return
+	}
+
+	if ((value.match(/\./g) || []).length > 1) {
+		target.value = value.slice(0, -1)
+		return
+	}
+
+	if (value.startsWith('.')) {
+		value = '0' + value
+	}
+
+	if (value.startsWith('0') && value.length > 1 && !value.includes('.')) {
+		value = '0.'
+	}
+
+	const parts = value.split('.')
+	if (parts.length === 2 && parts[1].length > 2) {
+		value = `${parts[0]}.${parts[1].slice(0, 2)}`
+	}
+
+	target.value = value
+}
+
+const scrollToError = (path: string): void => {
+	const element = document.querySelector(`[name="${path}"]`) as HTMLElement
+
+	if (element) {
+		const parent = element.parentElement
+
+		if (parent) {
+			parent.scrollIntoView({ behavior: 'smooth', block: 'center' })
+		}
+
+		element.focus()
+	}
+}
+
+const onSubmit = async () => {
+	isLoading.value = true
+
+	try {
+		await console.log('state', state)
+	} catch (error: any) {
+		if (error.statusCode === 422) {
+			handleError(error)
+		} else {
+			console.log('error', error)
+		}
+	} finally {
+		isLoading.value = false
+	}
+}
+
+const handleError = (error: any): void => {
+	if (error.data.data && error.data.data.errors) {
+		const errorEntries = Object.entries(error.data.data.errors)
+
+		formRef.value.setErrors(
+			errorEntries.map(([key, value]: any) => ({
+				message: value,
+				path: key
+			}))
+		)
+
+		const path = errorEntries[0][0]
+		scrollToError(path)
+	}
+}
+
+const onError = (event: FormErrorEvent): void => {
+	const path = event.errors[0].path
+	scrollToError(path)
+}
 </script>
 
 <template>
@@ -25,37 +156,68 @@ const model = computed({
 		<UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
 			<template #header> Создать транзакцию </template>
 
-			<div class="grid grid-cols-1 gap-2">
-				<UFormGroup label="Тип транзакции" name="type" :required="true">
-					<USelect :options="transactions" option-attribute="name" />
-				</UFormGroup>
+			<UForm
+				ref="formRef"
+				:schema="schema"
+				:state="state"
+				class="vacancy-form"
+				@error="onError"
+				@submit="onSubmit"
+			>
+				<div class="grid grid-cols-1 gap-2">
+					<UFormGroup label="Тип транзакции" name="type" :required="true">
+						<USelect
+							v-model="state.type"
+							:options="transactions"
+							option-attribute="name"
+							:disabled="isLoading"
+						/>
+					</UFormGroup>
 
-				<UFormGroup label="Сумма" name="amount" :required="true">
-					<UInput size="md" name="amount" type="text" placeholder="" />
-				</UFormGroup>
+					<UFormGroup label="Сумма" name="amount" :required="true">
+						<UInput
+							v-model.number="state.amount"
+							size="md"
+							name="amount"
+							type="tel"
+							placeholder=""
+							:disabled="isLoading"
+							@input="handleAmountInput"
+						/>
+					</UFormGroup>
 
-				<UFormGroup label="Дата" name="created_at" :required="true">
-					<UInput
-						size="md"
-						name="created_at"
-						type="date"
-						icon="i-heroicons-calendar-days-16-solid"
-						placeholder=""
-					/>
-				</UFormGroup>
+					<UFormGroup label="Дата" name="created_at" :required="true">
+						<UInput
+							v-model="state.created_at"
+							size="md"
+							name="created_at"
+							type="date"
+							icon="i-heroicons-calendar-days-16-solid"
+							placeholder=""
+							:disabled="isLoading"
+						/>
+					</UFormGroup>
 
-				<UFormGroup label="Категория" name="category" :required="true">
-					<USelect :options="categories" />
-				</UFormGroup>
+					<UFormGroup label="Категория" name="category" :required="true">
+						<USelect v-model="state.category" :options="categories" :disabled="isLoading" />
+					</UFormGroup>
 
-				<UFormGroup label="Описание" name="description" hint="Необязательное">
-					<UTextarea size="md" name="description" type="text" placeholder="" />
-				</UFormGroup>
+					<UFormGroup label="Описание" name="description" hint="Необязательное">
+						<UTextarea
+							v-model="state.description"
+							size="md"
+							name="description"
+							type="text"
+							placeholder=""
+							:disabled="isLoading"
+						/>
+					</UFormGroup>
 
-				<div class="py-2">
-					<UButton size="md" type="submit" label="Сохранить" />
+					<div class="py-2">
+						<UButton size="md" type="submit" label="Сохранить" :disabled="isLoading" />
+					</div>
 				</div>
-			</div>
+			</UForm>
 		</UCard>
 	</UModal>
 </template>
