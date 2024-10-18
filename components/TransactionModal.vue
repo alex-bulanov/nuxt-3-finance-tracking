@@ -20,6 +20,8 @@ const model = computed({
 		return props.modelValue
 	},
 	set(newValue) {
+		if (!newValue) resetForm()
+
 		emits('update:modelValue', newValue)
 	}
 })
@@ -28,19 +30,23 @@ const isLoading = ref<boolean>(false)
 const formRef = ref()
 
 interface FormState {
-	type: string
+	type: string | undefined
 	amount: number | undefined
-	created_at: string
-	category: string
-	description: string
+	created_at: string | undefined
+	category: string | undefined
+	description: string | undefined
+}
+
+const initialState = {
+	type: undefined,
+	amount: undefined,
+	created_at: undefined,
+	category: undefined,
+	description: undefined
 }
 
 const state = reactive<FormState>({
-	type: '',
-	amount: undefined,
-	created_at: '',
-	category: '',
-	description: ''
+	...initialState
 })
 
 const defaultSchema = Yup.object({
@@ -112,6 +118,11 @@ const handleAmountInput = (event: Event) => {
 	target.value = value
 }
 
+const resetForm = () => {
+	Object.assign(state, initialState)
+	formRef.value.clear()
+}
+
 const scrollToError = (path: string): void => {
 	const element = document.querySelector(`[name="${path}"]`) as HTMLElement
 
@@ -142,6 +153,11 @@ const onSubmit = async () => {
 	}
 }
 
+const onError = (event: FormErrorEvent): void => {
+	const path = event.errors[0].path
+	scrollToError(path)
+}
+
 const handleError = (error: any): void => {
 	if (error.data.data && error.data.data.errors) {
 		const errorEntries = Object.entries(error.data.data.errors)
@@ -156,11 +172,6 @@ const handleError = (error: any): void => {
 		const path = errorEntries[0][0]
 		scrollToError(path)
 	}
-}
-
-const onError = (event: FormErrorEvent): void => {
-	const path = event.errors[0].path
-	scrollToError(path)
 }
 </script>
 
