@@ -70,8 +70,8 @@ const icon = computed<string>(() =>
 
 <template>
 	<div class="[&:not(:last-child)]:border-b border-gray-200 dark:border-gray-800 py-2">
-		<div class="flex space-x-4">
-			<div class="w-1/2 flex justify-between items-center space-x-2">
+		<div class="grid grid-cols-8 gap-4">
+			<div class="col-span-5 flex justify-between items-center space-x-2">
 				<div class="flex items-center space-x-1 truncate">
 					<UIcon class="shrink-0 mt-1 w-6 h-6" :class="{ red: !isUp, green: isUp }" :name="icon" />
 					<span class="text-sm font-semibold truncate">{{ transaction.description }}</span>
@@ -79,7 +79,7 @@ const icon = computed<string>(() =>
 
 				<UBadge v-if="transaction.category" color="white">{{ transaction.category }}</UBadge>
 			</div>
-			<div class="w-1/2 flex justify-between items-center space-x-2">
+			<div class="col-span-3 flex justify-between items-center space-x-2">
 				<div class="shrink-0 grow text-end font-mono">{{ currency }}</div>
 
 				<UDropdown :items="items" mode="click" :popper="{ placement: 'bottom-start' }">

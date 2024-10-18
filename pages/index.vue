@@ -24,7 +24,7 @@ const fetchTransactions = async () => {
 	isLoading.value = true
 	try {
 		const { data } = await useAsyncData('transactions', async () => {
-			const { data, error } = await supabase.from('transactions').select()
+			const { data, error } = await supabase.from('transactions').select().order('created_at', {ascending: false})
 
 			if (error || !data) return []
 
@@ -55,7 +55,7 @@ const transactionsGroupedByDate = computed(() => {
 	return grouped
 })
 
-const handleDaleted = async () => {
+const handleDeleted = async () => {
 	await refreshTransactions()
 }
 
@@ -145,7 +145,7 @@ await refreshTransactions()
 							:key="transaction.id"
 							:transaction="transaction"
 							:loading="isLoading"
-							@deleted="handleDaleted"
+							@deleted="handleDeleted"
 						/>
 					</div>
 				</div>
