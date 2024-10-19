@@ -13,7 +13,11 @@ const props = defineProps<Props>()
 
 const emits = defineEmits<{
 	(e: 'update:modelValue', modelValue: boolean): void
+	(e: 'saved'): void
 }>()
+
+const supabase = useSupabaseClient()
+const toast = useToast()
 
 const model = computed({
 	get() {
@@ -141,12 +145,29 @@ const onSubmit = async () => {
 	isLoading.value = true
 
 	try {
-		await console.log('state', state)
+		const { error } = await supabase.from('transactions').upsert({ ...state })
+
+		if (error) {
+			throw error
+		}
+
+		toast.add({
+			title: 'Опрерация сохранена',
+			icon: 'i-heroicons-check-circle-16-solid'
+		})
+
+		model.value = false
+		emits('saved')
 	} catch (error: any) {
 		if (error.statusCode === 422) {
 			handleError(error)
 		} else {
-			console.log('error', error)
+			toast.add({
+				title: 'Ошибка добавления операции',
+				icon: 'i-heroicons-exclamation-circle-16-solid',
+				description: error.message,
+				color: 'red'
+			})
 		}
 	} finally {
 		isLoading.value = false

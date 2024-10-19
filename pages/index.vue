@@ -59,6 +59,10 @@ const handleDeleted = async () => {
 	await refreshTransactions()
 }
 
+const handleSaved = async ()=> {
+  await refreshTransactions()
+}
+
 await refreshTransactions()
 </script>
 
@@ -131,7 +135,7 @@ await refreshTransactions()
 							<span class="hidden md:block pb-1 text-lg font-semibold">Новая операция</span>
 						</UButton>
 
-						<TransactionModal v-model="isOpen" />
+						<TransactionModal v-model="isOpen" @saved="handleSaved"/>
 					</div>
 				</div>
 			</section>
