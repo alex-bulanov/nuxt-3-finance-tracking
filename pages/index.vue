@@ -1,66 +1,25 @@
 <script setup lang="ts">
 import { transactionViewOptions } from '~/constants'
-import { TypeTransaction } from '~/types/TypeTransaction'
-import type { Transaction } from '~/types/Transation'
+
+const {
+	pending: isLoading,
+	refreshTransactions,
+	incomesCount,
+	expensesCount,
+	incomesTotal,
+	expensesTotal,
+	transactionsGroupedByDate
+} = useTransactions()
 
 const isOpen = ref(false)
 const viewSelected = ref(transactionViewOptions[1])
-
-const supabase = useSupabaseClient()
-
-const transactions = ref<Transaction[]>([])
-const isLoading = ref<boolean>(false)
-
-const incomes = computed(() => transactions.value.filter(t => t.type === TypeTransaction.INCOME))
-const expenses = computed(() => transactions.value.filter(t => t.type === TypeTransaction.EXPENSES))
-
-const incomesCount = computed(() => incomes.value.length)
-const expensesCount = computed(() => expenses.value.length)
-
-const incomesTotal = computed(() => incomes.value.reduce((sum, t) => sum + Number(t.amount), 0))
-const expensesTotal = computed(() => expenses.value.reduce((sum, t) => sum + Number(t.amount), 0))
-
-const fetchTransactions = async () => {
-	isLoading.value = true
-	try {
-		const { data } = await useAsyncData('transactions', async () => {
-			const { data, error } = await supabase.from('transactions').select().order('created_at', {ascending: false})
-
-			if (error || !data) return []
-
-			return data
-		})
-
-		return data.value ?? []
-	} finally {
-		isLoading.value = false
-	}
-}
-
-const refreshTransactions = async () => (transactions.value = await fetchTransactions())
-
-const transactionsGroupedByDate = computed(() => {
-	const grouped: { [key: string]: (typeof transactions.value)[0][] } = {}
-
-	for (const transaction of transactions.value) {
-		const date = new Date(transaction.created_at).toLocaleString('ru').split(',')[0]
-
-		if (!grouped[date]) {
-			grouped[date] = []
-		}
-
-		grouped[date].push(transaction)
-	}
-
-	return grouped
-})
 
 const handleDeleted = async () => {
 	await refreshTransactions()
 }
 
-const handleSaved = async ()=> {
-  await refreshTransactions()
+const handleSaved = async () => {
+	await refreshTransactions()
 }
 
 await refreshTransactions()
@@ -135,7 +94,7 @@ await refreshTransactions()
 							<span class="hidden md:block pb-1 text-lg font-semibold">Новая операция</span>
 						</UButton>
 
-						<TransactionModal v-model="isOpen" @saved="handleSaved"/>
+						<TransactionModal v-model="isOpen" @saved="handleSaved" />
 					</div>
 				</div>
 			</section>
