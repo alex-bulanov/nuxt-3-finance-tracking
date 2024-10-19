@@ -1,7 +1,16 @@
-export const transactionViewOptions = [
-	'Год',
-	'Месяц',
-	'День'
+export const periods = [
+	{
+		name: 'Год',
+		value: 'Year'
+	},
+	{
+		name: 'Месяц',
+		value: 'Month'
+	},
+	{
+		name: 'День',
+		value: 'Day'
+	}
 ]
 
 export const categories = [

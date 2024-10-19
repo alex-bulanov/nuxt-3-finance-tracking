@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { transactionViewOptions } from '~/constants'
+import { periods } from '~/constants'
 
 const {
 	pending: isLoading,
@@ -12,7 +12,8 @@ const {
 } = useTransactions()
 
 const isOpen = ref(false)
-const viewSelected = ref(transactionViewOptions[1])
+const viewSelected = ref(periods[1])
+const { dates } = usePeriods(viewSelected)
 
 const handleDeleted = async () => {
 	await refreshTransactions()
@@ -27,6 +28,7 @@ await refreshTransactions()
 
 <template>
 	<div>
+		{{ dates }}
 		<UContainer>
 			<section class="my-10">
 				<div class="flex justify-between items-center">
@@ -37,7 +39,7 @@ await refreshTransactions()
 						</h2>
 					</div>
 					<div>
-						<USelectMenu v-model="viewSelected" :options="transactionViewOptions" />
+						<USelectMenu v-model="viewSelected" :options="periods" option-attribute="name" />
 					</div>
 				</div>
 			</section>
@@ -46,15 +48,15 @@ await refreshTransactions()
 				<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
 					<TrendCard
 						title="Доход"
-						:amount="4000"
-						:last-amount="incomesTotal"
+						:amount="incomesTotal"
+						:last-amount="4000"
 						color="green"
 						:loading="isLoading"
 					/>
 					<TrendCard
 						title="Расходы"
-						:amount="4000"
-						:last-amount="expensesTotal"
+						:amount="expensesTotal"
+						:last-amount="4000"
 						color="red"
 						:loading="isLoading"
 					/>
