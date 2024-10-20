@@ -1,29 +1,27 @@
 import { sub, startOfYear, endOfYear, startOfMonth, endOfMonth, startOfDay, endOfDay } from 'date-fns'
 
 export function usePeriods(period: Ref<{ name: string; value: string }>) {
-	const current = computed(() => {
+	const current = computed<{ from: Date; to: Date } | undefined>(() => {
 		switch (period.value.value) {
 			case 'Year':
 				return {
 					from: startOfYear(new Date()),
-					to: new Date()
+					to: endOfYear(new Date())
 				}
 			case 'Month':
 				return {
 					from: startOfMonth(new Date()),
-					to: new Date()
+					to: endOfMonth(new Date())
 				}
 			case 'Day':
 				return {
 					from: startOfDay(new Date()),
-					to: new Date()
+					to: endOfDay(new Date())
 				}
-			default:
-				return undefined
 		}
 	})
 
-	const previous = computed(() => {
+	const previous = computed<{ from: Date; to: Date } | undefined>(() => {
 		switch (period.value.value) {
 			case 'Year':
 				return {
@@ -40,8 +38,6 @@ export function usePeriods(period: Ref<{ name: string; value: string }>) {
 					from: startOfDay(sub(new Date(), { days: 1 })),
 					to: endOfDay(sub(new Date(), { days: 1 }))
 				}
-			default:
-				return undefined
 		}
 	})
 

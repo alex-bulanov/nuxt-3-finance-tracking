@@ -9,6 +9,8 @@ interface Props {
 
 const props = defineProps<Props>()
 
+const { amount } = toRefs(props)
+
 const isUp = computed<boolean>(() => props.amount >= props.lastAmount)
 
 const icon = computed<string>(() =>
@@ -24,7 +26,7 @@ const percentage = computed(() => {
 	return `${Math.ceil(((bigger - lower) / lower) * 100)}%`
 })
 
-const { currency } = useCurrency(props.amount)
+const { currency } = useCurrency(amount)
 </script>
 
 <template>

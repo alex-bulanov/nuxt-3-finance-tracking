@@ -65,7 +65,7 @@ export function useTransactions(period: ComputedRef<{ from: Date; to: Date }> | 
 		async () => {
 			await refreshTransactions()
 		},
-		{ immediate: true }
+		{ deep: true }
 	)
 
 	return {

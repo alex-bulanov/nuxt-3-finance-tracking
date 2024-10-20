@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { periods } from '~/constants'
 
-const isOpen = ref(false)
-const selected = ref(periods[1])
+const isOpen = ref<boolean>(false)
+const selected = ref<{ name: string; value: string }>(periods[1])
 
 const { current, previous } = usePeriods(selected)
 
@@ -16,7 +16,14 @@ const {
 	transactionsGroupedByDate
 } = useTransactions(current)
 
-const { incomesTotal: prevIncomesTotal, expensesTotal: prevExpensesTotal } = useTransactions(previous)
+const {
+	refreshTransactions: prevRefreshTransactions,
+	incomesTotal: prevIncomesTotal,
+	expensesTotal: prevExpensesTotal
+} = useTransactions(previous)
+
+await refreshTransactions()
+await prevRefreshTransactions()
 
 const handleDeleted = async () => {
 	await refreshTransactions()
