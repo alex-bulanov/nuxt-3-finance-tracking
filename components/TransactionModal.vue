@@ -263,8 +263,15 @@ const handleError = (error: any): void => {
 						/>
 					</UFormGroup>
 
-					<div class="py-2">
-						<UButton size="md" type="submit" label="Сохранить" :disabled="isLoading" />
+					<div class="mt-6">
+						<UButton
+							block
+							class="sm:mx-auto sm:w-auto sm:min-w-40"
+							size="md"
+							type="submit"
+							label="Создать"
+							:disabled="isLoading"
+						/>
 					</div>
 				</div>
 			</UForm>
