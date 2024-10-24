@@ -3,6 +3,8 @@ definePageMeta({
 	layout: 'empty'
 })
 
+useIsAuthenticated()
+
 const isSuccess = ref<boolean>(false)
 const email = ref<string>('')
 

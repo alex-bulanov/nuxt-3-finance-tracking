@@ -1,18 +1,4 @@
-<script setup lang="ts">
-const user = useSupabaseUser()
-
-watch(
-	user,
-	() => {
-		if (user) {
-			console.log('Вы вошли в систему')
-		}
-	},
-	{
-		immediate: true
-	}
-)
-</script>
+<script setup lang="ts"></script>
 
 <template>
 	<header class="fixed top-0 left-0 z-50 w-full bg-white dark:bg-[#1c1b22] shadow-sm">

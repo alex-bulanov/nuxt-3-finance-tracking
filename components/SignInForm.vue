@@ -50,7 +50,7 @@ const onSubmit = async () => {
 		const { error } = await supabase.auth.signInWithOtp({
 			email: state.email!,
 			options: {
-				emailRedirectTo: 'http://localhost:3000'
+				emailRedirectTo: 'http://localhost:3000/confirm/'
 			}
 		})
 
