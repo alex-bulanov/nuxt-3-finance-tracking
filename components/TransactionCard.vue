@@ -52,7 +52,7 @@ const items = [
 		{
 			label: 'Удалить',
 			icon: 'i-heroicons-trash-16-solid',
-			class: 'hover:bg-red-50 dark:hover:bg-red-400',
+			class: 'text-red-600 dark:text-white hover:bg-red-50 dark:hover:bg-red-400',
 			iconClass: 'text-red-600 dark:text-white',
 			click: () => deleteTransaction()
 		}
@@ -85,7 +85,7 @@ const icon = computed<string>(() =>
 				<UDropdown :items="items" mode="click" :popper="{ placement: 'bottom-start' }">
 					<UButton
 						truncate
-						icon="i-heroicons-cog-16-solid"
+						icon="i-heroicons-cog-8-tooth"
 						class="w-full"
 						color="white"
 						variant="ghost"
