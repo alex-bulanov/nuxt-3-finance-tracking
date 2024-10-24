@@ -3,7 +3,13 @@ definePageMeta({
 	layout: 'empty'
 })
 
-const isSuccess = ref<boolean>(true)
+const isSuccess = ref<boolean>(false)
+const email = ref<string>('')
+
+const handleSubmitSuccess = (submittedEmail: string) => {
+	isSuccess.value = true
+	email.value = submittedEmail
+}
 </script>
 
 <template>
@@ -15,7 +21,7 @@ const isSuccess = ref<boolean>(true)
 						<p class="font-semibold text-center">Добро Пожаловать!</p>
 					</template>
 
-					<SignInForm />
+					<SignInForm @submit-success="handleSubmitSuccess" />
 				</UCard>
 				<UCard v-else class="mx-auto sm:max-w-lg">
 					<template #header>
@@ -24,7 +30,7 @@ const isSuccess = ref<boolean>(true)
 
 					<div class="text-center">
 						<p class="mb-4">
-							Мы отправили электронное письмо на адрес <strong>{{ 'email' }}</strong> со ссылкой для входа
+							Мы отправили электронное письмо на адрес <strong>{{ email }}</strong> со ссылкой для входа
 						</p>
 						<p><strong>Внимание: </strong> Срок действия ссылки истечет через 5 минут.</p>
 					</div>

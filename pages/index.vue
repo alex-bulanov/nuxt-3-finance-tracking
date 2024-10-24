@@ -113,7 +113,7 @@ await refreshTransactions()
 			<section class="my-10">
 				<div v-if="!isLoading" class="grid grid-cols-1">
 					<div v-for="(transactionsOnDay, date) in transactionsGroupedByDate" :key="date">
-						<DailyTransactionSummaryCard :date="date" :transactions="transactionsOnDay" />
+						<DailyCard :date="date" :transactions="transactionsOnDay" />
 						<TransactionCard
 							v-for="transaction in transactionsOnDay"
 							:key="transaction.id"

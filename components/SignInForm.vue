@@ -2,10 +2,15 @@
 import * as Yup from 'yup'
 import type { FormErrorEvent } from '#ui/types'
 
+const emits = defineEmits<{
+	(e: 'submit-success', email: string): void
+	(e: 'submit-failure'): void
+}>()
+
 const isLoading = ref<boolean>(false)
 const formRef = ref()
 
-// const supabase = useSupabaseClient()
+const supabase = useSupabaseClient()
 const toast = useToast()
 
 interface FormState {
@@ -41,13 +46,18 @@ const scrollToError = (path: string): void => {
 const onSubmit = async () => {
 	isLoading.value = true
 
-	await console.log('submit')
-
 	try {
-		// const { error } = await supabase.from('transactions').upsert({ ...state })
-		// if (error) {
-		// 	throw error
-		// }
+		const { error } = await supabase.auth.signInWithOtp({
+			email: state.email!,
+			options: {
+				emailRedirectTo: 'http://localhost:3000'
+			}
+		})
+
+		if (error) {
+			throw error
+		}
+		emits('submit-success', state.email!)
 	} catch (error: any) {
 		if (error.statusCode === 422) {
 			handleError(error)
@@ -59,6 +69,7 @@ const onSubmit = async () => {
 				color: 'red'
 			})
 		}
+		emits('submit-failure')
 	} finally {
 		isLoading.value = false
 	}
